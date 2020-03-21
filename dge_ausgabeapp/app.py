@@ -1,5 +1,6 @@
 from datetime import datetime
 from pathlib import Path
+from typing import Callable
 
 import stdnum.de.idnr
 from structlog import get_logger
@@ -21,9 +22,11 @@ def tax_id_to_password(tax_id: str) -> bytes:
     return stdnum.de.idnr.compact(tax_id).encode()
 
 
-def tax_id_to_filename_stem(tax_id: str) -> str:
+def tax_id_to_filename_stem(
+    tax_id: str, now_callable: Callable[[], datetime] = datetime.now
+) -> str:
     tax_id_formatted = stdnum.de.idnr.format(tax_id).replace(" ", "-")
-    return f"wallet_{tax_id_formatted}_{datetime.now():%Y-%m-%dT%H:%M:%S}"
+    return f"wallet_{tax_id_formatted}_{now_callable():%Y-%m-%dT%H:%M:%S}"
 
 
 def generate_wallet(tax_id: str, amount_whole_token: int, target_path: Path) -> None:
