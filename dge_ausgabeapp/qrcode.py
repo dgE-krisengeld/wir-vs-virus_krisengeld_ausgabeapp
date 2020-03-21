@@ -1,29 +1,28 @@
 from pathlib import PosixPath
 
-import xxhash
 import qrcode
+import xxhash
 
 
-def derive_private_key_hash(private_key):
+def derive_private_key_hash(private_key: bytes) -> str:
     x = xxhash.xxh32()
     x.update(private_key)
     return x.hexdigest()[:16]
 
 
 class QRGenerator:
-
     @staticmethod
-    def make_qr():
+    def make_qr() -> "qrcode.QRCode":
         # FIXME do we have to create an object every time?
         #   remove effects of the .add_data() after every write and reuse one object
         return qrcode.QRCode(
-            version=4, # can encode 288 bit with H error correct (33x33 modules)
+            version=4,  # can encode 288 bit with H error correct (33x33 modules)
             error_correction=qrcode.constants.ERROR_CORRECT_H,
             box_size=10,
             border=4,
         )
 
-    def generate(self, directory: PosixPath, private_key: bytes):
+    def generate(self, directory: PosixPath, private_key: bytes) -> None:
         if not directory.is_dir():
             raise NotADirectoryError("Provided path has to be a directory")
 
