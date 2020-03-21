@@ -11,6 +11,9 @@ eth-keyfile = "^0.5.1"
 web3 = "^5.7.0"
 qrcode = {extras = ["pil"], version = "^6.1"}
 xxhash = "^1.4.3"
+python-stdnum = "^1.13"
+structlog = "^20.1.0"
+colorama = "^0.4.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^4.6"
