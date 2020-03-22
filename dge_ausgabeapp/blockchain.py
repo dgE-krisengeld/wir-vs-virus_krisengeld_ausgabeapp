@@ -13,8 +13,7 @@ from web3.gas_strategies.rpc import rpc_gas_price_strategy
 if TYPE_CHECKING:
     from web3.contract import ContractFunction
 
-# TODO this is görli for now
-CONTRACT_ADDRESS = Address(to_bytes("0x40089B4198f6adCe8F713A501cFb627a38974f79"))
+CONTRACT_ADDRESS = Address(to_bytes(0x6D5368A0B537784391D00BD00CAC3C6470BB8E38))
 # TODO import this from the contract repo
 CONTRACT_PATH = Path(__file__).parent.absolute() / Path("../contracts/dgE.json")
 
@@ -56,8 +55,10 @@ def transact_function(web3: Web3, func: "ContractFunction", private_key: bytes) 
     signed_txn = web3.eth.account.sign_transaction(txn, private_key=private_key)
 
     tx_hash = web3.eth.sendRawTransaction(signed_txn.rawTransaction)
-    log.debug(f"TXHash received: {web3.toHex(tx_hash)}")
-    tx_receipt = web3.eth.waitForTransactionReceipt(tx_hash)
+    log.debug(f"TX sent: {web3.toHex(tx_hash)}")
+    timeout = 500
+    log.debug(f"Waiting for TXHash: {web3.toHex(tx_hash)}, timout={timeout} s")
+    tx_receipt = web3.eth.waitForTransactionReceipt(tx_hash, timeout=500)
     log.debug(f"TX receipt received: {tx_receipt}")
 
 
