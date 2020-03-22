@@ -26,15 +26,15 @@ jobs:
     - uses: actions/cache@v1.1.2
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('poetry.lock') }}
+        key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('poetry.lock') }}
         restore-keys: |
-          ${{ runner.os }}-pip-
+          ${{ runner.os }}-pip-${{ matrix.python-version }}-
     - uses: actions/cache@v1.1.2
       with:
         path: ~/.cache/pypoetry/virtualenvs
-        key: ${{ runner.os }}-poetry_venv-${{ hashFiles('poetry.lock') }}
+        key: ${{ runner.os }}-poetry_venv-${{ matrix.python-version }}-${{ hashFiles('poetry.lock') }}
         restore-keys: |
-          ${{ runner.os }}-poetry_venv-
+          ${{ runner.os }}-poetry_venv-${{ matrix.python-version }}-
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip poetry
