@@ -2,7 +2,7 @@ import webbrowser
 from datetime import datetime
 from pathlib import Path
 from typing import Callable
-from urllib.parse import quote_plus
+from urllib.parse import quote
 
 import stdnum.de.idnr
 from eth_typing import Address
@@ -20,7 +20,7 @@ from dge_ausgabeapp.output import render_paper_wallet
 
 log = get_logger(__name__)
 
-TARGET_URL_BASE = "https://krisengeld.some.domain/open?keystore="
+TARGET_URL_BASE = "https://bundesburner.web.app/open/"
 
 
 def tax_id_to_password(tax_id: str) -> bytes:
@@ -44,7 +44,7 @@ def tax_id_to_filename_stem(
 def make_url_from_keystore_json(
     keystore_json: str, _target_url_base: str = TARGET_URL_BASE
 ) -> str:
-    return f"{_target_url_base}{quote_plus(keystore_json)}"
+    return f"{_target_url_base}{quote(keystore_json)}"
 
 
 def generate_wallet(
@@ -72,7 +72,7 @@ def generate_wallet(
         keystore_path=keystore_path, password=keystore_password, web3=web3
     )
 
-    log.info("Minting tokens", amount_whole_token=amount_whole_token)
+    log.info("Minting dgE tokens", amount_whole_token=amount_whole_token)
     token_contract = get_token_contract(web3, token_contract_address=token_contract_address)
     mint_tokens(
         web3=web3,
