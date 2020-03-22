@@ -37,7 +37,7 @@ def configure_logging() -> None:
 @click.option(
     "-c",
     "--contract-address",
-    default="0x6D5368A0B537784391D00BD00CAC3C6470BB8E38",
+    default="0x956604d347412EAD40401af1eba87F0f847A1F01",
     show_default=True,
 )
 def main(

@@ -12,9 +12,11 @@ from web3 import HTTPProvider, Web3
 from web3.contract import Contract, ContractFunction
 from web3.gas_strategies.rpc import rpc_gas_price_strategy
 from web3.types import TxParams, Wei
+from yaspin import yaspin
+from yaspin.spinners import Spinners
 
 # TODO import this from the contract repo
-CONTRACT_PATH = Path(__file__).parent.absolute() / Path("../contracts/dgE.json")
+CONTRACT_PATH = Path(__file__).parent.parent.joinpath("contracts", "dgE.json")
 
 
 with open(CONTRACT_PATH, "r") as f:
@@ -63,8 +65,16 @@ def transact_function(web3: Web3, func: "ContractFunction", private_key: bytes) 
 
     tx_hash = web3.eth.sendRawTransaction(signed_txn.rawTransaction)
     tx_hash_hex = encode_hex(tx_hash)
-    log.debug("Waiting for TX", tx_hash=tx_hash_hex, timeout=500)
-    web3.eth.waitForTransactionReceipt(tx_hash, timeout=500)
+    wait_text = f"Waiting for tx {tx_hash_hex}"
+    with yaspin(Spinners.dots2, text=wait_text, color="green", reversal=True):
+        receipt = web3.eth.waitForTransactionReceipt(tx_hash, timeout=500)
+    assert receipt["blockNumber"] is not None, "TX receipt has empty block number"
+    status = receipt.get("status")
+    assert status is not None, "TX reciept has no 'status'"
+    if status == 0:
+        log.error("TX failed", status=status, receipt=receipt)
+        raise RuntimeError("Transaction failed")
+
     log.debug("TX confirmed", tx_hash=tx_hash_hex)
 
 
@@ -75,7 +85,7 @@ def mint_tokens(
     target_address: Address,
     amount: int,
 ) -> None:
-    log.info("Minting dgE", amount=amount, target_address=to_checksum_address(target_address))
+    log.debug("Minting tokens", amount=amount, target_address=to_checksum_address(target_address))
     mintFor = token_contract.functions.mintFor(target_address, amount)
     transact_function(web3, mintFor, local_private_key)
 
