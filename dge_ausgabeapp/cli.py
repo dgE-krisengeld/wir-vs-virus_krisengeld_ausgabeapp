@@ -2,6 +2,8 @@ from pathlib import Path
 
 import click
 import structlog
+from eth_typing import Address
+from eth_utils import to_canonical_address
 from structlog import get_logger
 
 from dge_ausgabeapp import __version__
@@ -32,13 +34,27 @@ def configure_logging() -> None:
 )
 @click.password_option("-p", "--password")
 @click.option("-r", "--rpc-url", required=True)
+@click.option(
+    "-c",
+    "--contract-address",
+    default="0x6D5368A0B537784391D00BD00CAC3C6470BB8E38",
+    show_default=True,
+)
 def main(
-    tax_id: str, amount: int, output_dir: str, keystore_file: str, password: str, rpc_url: str
+    tax_id: str,
+    amount: int,
+    output_dir: str,
+    keystore_file: str,
+    password: str,
+    rpc_url: str,
+    contract_address: str,
 ) -> None:
     configure_logging()
     target_path = Path(output_dir)
 
     log.info(f"dgE AusgabeApp v{__version__}")
+
+    token_contract_address = Address(to_canonical_address(contract_address))
 
     generate_wallet(
         tax_id=tax_id,
@@ -47,5 +63,6 @@ def main(
         rpc_url=rpc_url,
         keystore_path=Path(keystore_file),
         keystore_password=password.encode(),
+        token_contract_address=token_contract_address,
     )
     log.info("Done")

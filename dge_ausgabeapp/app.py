@@ -5,11 +5,17 @@ from typing import Callable
 from urllib.parse import quote_plus
 
 import stdnum.de.idnr
-from eth_keys import keys
+from eth_typing import Address
 from eth_utils import to_checksum_address
 from structlog import get_logger
 
-from dge_ausgabeapp.blockchain import generate_keystore, get_web3, load_private_key, mint_tokens
+from dge_ausgabeapp.blockchain import (
+    generate_keystore,
+    get_token_contract,
+    get_web3,
+    load_private_key,
+    mint_tokens,
+)
 from dge_ausgabeapp.output import render_paper_wallet
 
 log = get_logger(__name__)
@@ -48,6 +54,7 @@ def generate_wallet(
     rpc_url: str,
     keystore_path: Path,
     keystore_password: bytes,
+    token_contract_address: Address,
 ) -> None:
     """
 
@@ -61,17 +68,16 @@ def generate_wallet(
     log.debug("Generated keystore", address=to_checksum_address(generated_address_bin))
 
     web3 = get_web3(rpc_url=rpc_url)
-    local_private_key = load_private_key(keystore_path=keystore_path, password=keystore_password)
-
-    priv_key = keys.PrivateKey(local_private_key)
-    pub_key = priv_key.public_key
-
-    web3.eth.defaultAccount = pub_key.to_checksum_address()
+    local_private_key = load_private_key(
+        keystore_path=keystore_path, password=keystore_password, web3=web3
+    )
 
     log.info("Minting tokens", amount_whole_token=amount_whole_token)
+    token_contract = get_token_contract(web3, token_contract_address=token_contract_address)
     mint_tokens(
         web3=web3,
         local_private_key=local_private_key,
+        token_contract=token_contract,
         target_address=generated_address_bin,
         amount=amount_whole_token * 10 ** 18,
     )
