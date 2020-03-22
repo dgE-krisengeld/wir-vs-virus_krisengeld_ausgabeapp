@@ -11,6 +11,7 @@ from structlog import get_logger
 from web3 import HTTPProvider, Web3
 from web3.contract import Contract, ContractFunction
 from web3.gas_strategies.rpc import rpc_gas_price_strategy
+from web3.types import TxParams, Wei
 
 # TODO import this from the contract repo
 CONTRACT_PATH = Path(__file__).parent.absolute() / Path("../contracts/dgE.json")
@@ -48,13 +49,14 @@ def get_token_contract(web3: Web3, token_contract_address: Address) -> Contract:
 def transact_function(web3: Web3, func: "ContractFunction", private_key: bytes) -> None:
     nonce = web3.eth.getTransactionCount(web3.eth.defaultAccount)  # type: ignore
     gas_price = web3.eth.generateGasPrice()
+    assert gas_price is not None, "generateGasPrice returned None!"
 
     # TODO be better informed about the estimate gas price!
     # estimate_gas = func.estimateGas()  # FIXME this doesn't work
 
     # Build a transaction that invokes this contract's function, called transfer
     txn = func.buildTransaction(
-        {"gas": 70000, "gasPrice": gas_price, "nonce": nonce}  # type: ignore
+        TxParams({"gas": Wei(70000), "gasPrice": gas_price, "nonce": nonce})
     )
 
     signed_txn = web3.eth.account.sign_transaction(txn, private_key=private_key)
