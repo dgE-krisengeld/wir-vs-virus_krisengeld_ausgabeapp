@@ -5,6 +5,7 @@ from typing import Callable
 from urllib.parse import quote_plus
 
 import stdnum.de.idnr
+from eth_keys import keys
 from eth_utils import to_checksum_address
 from structlog import get_logger
 
@@ -61,6 +62,11 @@ def generate_wallet(
 
     web3 = get_web3(rpc_url=rpc_url)
     local_private_key = load_private_key(keystore_path=keystore_path, password=keystore_password)
+
+    priv_key = keys.PrivateKey(local_private_key)
+    pub_key = priv_key.public_key
+
+    web3.eth.defaultAccount = pub_key.to_checksum_address()
 
     log.info("Minting tokens", amount_whole_token=amount_whole_token)
     mint_tokens(
