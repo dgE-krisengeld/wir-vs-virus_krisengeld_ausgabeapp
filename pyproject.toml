@@ -13,6 +13,8 @@ qrcode = {extras = ["pil"], version = "^6.1"}
 python-stdnum = "^1.13"
 structlog = "^20.1.0"
 colorama = "^0.4.3"
+pdfrw = "^0.4"
+reportlab = "^3.5.42"
 
 [tool.poetry.dev-dependencies]
 pytest = "^4.6"
