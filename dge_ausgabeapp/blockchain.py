@@ -11,10 +11,10 @@ from eth_utils import to_canonical_address
 from web3 import HTTPProvider, Web3
 from web3.gas_strategies.rpc import rpc_gas_price_strategy
 
-
-CONTRACT_ADDRESS = Address('0xD65C7478739a9aa155f457c4B7cACd7B263eA1e4')
+# TODO this is görli for now
+CONTRACT_ADDRESS = Address('0x40089B4198f6adCe8F713A501cFb627a38974f79')
 # TODO import this from the contract repo
-CONTRACT_PATH = Path('../contracts/dgE.json')
+CONTRACT_PATH = Path(__file__).parent.absolute() / Path('../contracts/dgE.json')
 
 
 with open(CONTRACT_PATH, 'r') as f:
@@ -60,7 +60,7 @@ def transact_function(web3, func, private_key):
     tx_hash = web3.eth.sendRawTransaction(signed_txn.rawTransaction)
     log.debug(f"TXHash received: {web3.toHex(tx_hash)}")
     tx_receipt = web3.eth.waitForTransactionReceipt(tx_hash)
-    log.debug(f"TX receipt received: {web3.toHex(tx_receipt)}")
+    log.debug(f"TX receipt received: {tx_receipt}")
 
 
 def mint_tokens(
