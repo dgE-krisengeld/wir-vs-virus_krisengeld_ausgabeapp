@@ -1,30 +1,29 @@
 import json
 import os
+from pathlib import Path
 from typing import Tuple
 
-from eth_keyfile import create_keyfile_json
+from eth_keyfile import create_keyfile_json, decode_keyfile_json
 from eth_typing import URI, Address
 from eth_utils import to_canonical_address
 from web3 import HTTPProvider, Web3
-from web3.middleware import geth_poa_middleware
 
 
-def print_balance(address: Address, web3: Web3) -> None:
-    balance = web3.eth.getBalance(address)
-    print(web3.fromWei(balance, "ether"))  # prints etherium balance
+def get_web3(rpc_url: str) -> Web3:
+    return Web3(HTTPProvider(URI(rpc_url)))
 
 
-def print_connection_status(web3: Web3) -> None:
-    print(web3.isConnected())  # is everything working correctly
+def load_private_key(keystore_path: Path, password: bytes) -> bytes:
+    return decode_keyfile_json(json.loads(keystore_path.read_text()), password)
 
 
 def generate_keystore(password: bytes) -> Tuple[str, Address]:
-    keyfile_dict = create_keyfile_json(os.urandom(32), password=password)
+    privkey = os.urandom(32)
+    keyfile_dict = create_keyfile_json(privkey, password=password, iterations=100)
     return json.dumps(keyfile_dict), to_canonical_address(keyfile_dict["address"])
 
 
-def mint_tokens(address: Address, amount: int) -> None:
-    input_url = "https://"
-    w3 = Web3(HTTPProvider(URI(input_url)))
-    w3.middleware_onion.inject(geth_poa_middleware, layer=0)
-    w3.eth.getBlock("latest")
+def mint_tokens(
+    web3: Web3, local_private_key: bytes, target_address: Address, amount: int
+) -> None:
+    ...

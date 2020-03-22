@@ -25,4 +25,4 @@ def test_tax_id_to_filename_stem() -> None:
     filename_stem = tax_id_to_filename_stem(
         "36 574 261 809", lambda: datetime(2020, 1, 2, 3, 4, 5)
     )
-    assert filename_stem == "wallet_36-574-261-809_2020-01-02T03:04:05"
+    assert filename_stem == "wallet_36-574-261-809_2020-01-02T03-04-05"
