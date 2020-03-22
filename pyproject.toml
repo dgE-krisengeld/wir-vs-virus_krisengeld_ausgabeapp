@@ -15,6 +15,7 @@ structlog = "^20.1.0"
 colorama = "^0.4.3"
 pdfrw = "^0.4"
 reportlab = "^3.5.42"
+eth-keys = "<0.3.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^4.6"
