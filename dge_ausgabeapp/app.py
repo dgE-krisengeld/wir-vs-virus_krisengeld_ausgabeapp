@@ -15,6 +15,8 @@ from dge_ausgabeapp.blockchain import (
     get_web3,
     load_private_key,
     mint_tokens,
+    send_native_coin,
+    whitelist_address,
 )
 from dge_ausgabeapp.output import render_paper_wallet
 
@@ -82,6 +84,13 @@ def generate_wallet(
         amount=amount_whole_token * 10 ** 18,
     )
 
+    send_native_coin(
+        web3=web3,
+        local_private_key=local_private_key,
+        target_address=generated_address_bin,
+        amount_in_eth=0.001,
+    )
+
     target_file_name = Path(tax_id_to_filename_stem(tax_id=tax_id)).with_suffix(".pdf")
     target_file_path = target_path.joinpath(target_file_name)
 
@@ -94,3 +103,26 @@ def generate_wallet(
     )
     render_paper_wallet(qr_data=generated_keystore_urlified, target_file_path=target_file_path)
     webbrowser.open(f"file://{target_file_path.absolute()}")
+    log.info("Done")
+
+
+def whitelist_acceptance_address(
+    rpc_url: str,
+    keystore_path: Path,
+    keystore_password: bytes,
+    token_contract_address: Address,
+    target_address: Address,
+) -> None:
+    web3 = get_web3(rpc_url=rpc_url)
+    local_private_key = load_private_key(
+        keystore_path=keystore_path, password=keystore_password, web3=web3
+    )
+    token_contract = get_token_contract(web3, token_contract_address=token_contract_address)
+
+    whitelist_address(
+        web3=web3,
+        local_private_key=local_private_key,
+        token_contract=token_contract,
+        target_address=target_address,
+    )
+    log.info("Done")
