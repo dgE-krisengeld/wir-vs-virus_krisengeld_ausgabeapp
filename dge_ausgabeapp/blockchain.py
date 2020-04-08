@@ -126,6 +126,36 @@ def mint_tokens(
 def whitelist_address(
     web3: Web3, local_private_key: PrivateKey, token_contract: Contract, target_address: Address
 ) -> None:
-    log.info(f"Whitelisting address", target_address=web3.toChecksumAddress(target_address))
+    log.info("Whitelisting address", target_address=to_checksum_address(target_address))
     setWhitelistAddress = token_contract.functions.setWhitelistAddress(target_address)
     transact_function(web3, setWhitelistAddress, local_private_key)
+    log.info("Successfully whitelisted", target_address=target_address)
+
+
+def minter_add(
+    web3: Web3, local_private_key: PrivateKey, token_contract: Contract, target_address: Address
+) -> None:
+    log.info("Adding minter", target_address=to_checksum_address(target_address))
+    if token_contract.functions.isMinter(target_address).call():
+        log.error("Address already is a minter", target_address=target_address)
+        return
+    transact_function(
+        web3=web3,
+        func=token_contract.functions.addMinter(target_address),
+        private_key=local_private_key,
+    )
+    log.info("Successfully added minter", target_address=target_address)
+
+
+def minter_remove_self(
+    web3: Web3, local_private_key: PrivateKey, token_contract: Contract,
+) -> None:
+    own_address = local_private_key.public_key.to_checksum_address()
+    log.info("Removing self from minters", target_address=to_checksum_address(own_address))
+    if not token_contract.functions.isMinter(own_address).call():
+        log.error("Address isn't a minter", target_address=own_address)
+        return
+    transact_function(
+        web3=web3, func=token_contract.functions.renounceMinter(), private_key=local_private_key,
+    )
+    log.info("Successfully removed self from minters", target_address=own_address)

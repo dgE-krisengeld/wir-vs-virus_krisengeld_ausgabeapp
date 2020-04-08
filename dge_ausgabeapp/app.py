@@ -1,7 +1,7 @@
 import webbrowser
 from datetime import datetime
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Optional
 from urllib.parse import quote
 
 import stdnum.de.idnr
@@ -15,6 +15,8 @@ from dge_ausgabeapp.blockchain import (
     get_web3,
     load_private_key,
     mint_tokens,
+    minter_add,
+    minter_remove_self,
     send_native_coin,
     whitelist_address,
 )
@@ -125,4 +127,33 @@ def whitelist_acceptance_address(
         token_contract=token_contract,
         target_address=target_address,
     )
+    log.info("Done")
+
+
+def minter_add_or_remove(
+    rpc_url: str,
+    keystore_path: Path,
+    keystore_password: bytes,
+    token_contract_address: Address,
+    target_address: Optional[Address],
+    add: bool,
+) -> None:
+    web3 = get_web3(rpc_url=rpc_url)
+    local_private_key = load_private_key(
+        keystore_path=keystore_path, password=keystore_password, web3=web3
+    )
+    token_contract = get_token_contract(web3, token_contract_address=token_contract_address)
+
+    if add:
+        assert target_address is not None, "Adding a minter requires an address"
+        minter_add(
+            web3=web3,
+            local_private_key=local_private_key,
+            token_contract=token_contract,
+            target_address=target_address,
+        )
+    else:
+        minter_remove_self(
+            web3=web3, local_private_key=local_private_key, token_contract=token_contract,
+        )
     log.info("Done")

@@ -9,7 +9,7 @@ from eth_utils import to_canonical_address
 from structlog import get_logger
 
 from dge_ausgabeapp import __version__
-from dge_ausgabeapp.app import generate_wallet, whitelist_acceptance_address
+from dge_ausgabeapp.app import generate_wallet, minter_add_or_remove, whitelist_acceptance_address
 
 log = get_logger(__name__)
 
@@ -92,4 +92,36 @@ def whitelist(obj: Params, address: str) -> None:
         keystore_password=obj.password,
         token_contract_address=obj.token_contract_address,
         target_address=to_canonical_address(address),
+    )
+
+
+@main.group(help="Modify the list of minters")
+def minter() -> None:
+    pass
+
+
+@minter.command(name="add", help="Add a minter")
+@click.option("-a", "--address", required=True)
+@click.pass_obj
+def cli_minter_add(obj: Params, address: str) -> None:
+    minter_add_or_remove(
+        rpc_url=obj.rpc_url,
+        keystore_path=obj.keystore_path,
+        keystore_password=obj.password,
+        token_contract_address=obj.token_contract_address,
+        target_address=to_canonical_address(address),
+        add=True,
+    )
+
+
+@minter.command(name="remove-self", help="Remove oneself from the list of minters")
+@click.pass_obj
+def cli_minter_remove(obj: Params) -> None:
+    minter_add_or_remove(
+        rpc_url=obj.rpc_url,
+        keystore_path=obj.keystore_path,
+        keystore_password=obj.password,
+        token_contract_address=obj.token_contract_address,
+        target_address=None,
+        add=False,
     )
