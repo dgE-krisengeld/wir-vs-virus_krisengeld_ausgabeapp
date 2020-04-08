@@ -144,14 +144,14 @@ def minter_add(
         func=token_contract.functions.addMinter(target_address),
         private_key=local_private_key,
     )
-    log.info("Successfully added minter", target_address=target_address)
+    log.info("Successfully added minter", target_address=to_checksum_address(target_address))
 
 
 def minter_remove_self(
     web3: Web3, local_private_key: PrivateKey, token_contract: Contract,
 ) -> None:
     own_address = local_private_key.public_key.to_checksum_address()
-    log.info("Removing self from minters", target_address=to_checksum_address(own_address))
+    log.info("Removing self from minters", target_address=own_address)
     if not token_contract.functions.isMinter(own_address).call():
         log.error("Address isn't a minter", target_address=own_address)
         return
