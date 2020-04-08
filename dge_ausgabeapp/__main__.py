@@ -1,4 +1,9 @@
 from dge_ausgabeapp.cli import main
 
-if __name__ == "__main__":
+
+def run() -> None:
     main(auto_envvar_prefix="DGE")
+
+
+if __name__ == "__main__":
+    run()

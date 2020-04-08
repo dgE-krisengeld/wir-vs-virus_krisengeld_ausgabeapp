@@ -27,7 +27,7 @@ flake8 = "^3.7.9"
 bpython = "^0.18"
 
 [tool.poetry.scripts]
-dge-ausgabeapp = 'dge_ausgabeapp.__main__:main'
+dge-ausgabeapp = 'dge_ausgabeapp.__main__:run'
 
 [tool.black]
 line-length = 99
